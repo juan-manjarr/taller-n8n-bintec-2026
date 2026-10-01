@@ -1,0 +1,6 @@
+# .env contiene tu llave: nunca se sube al repositorio
+.env
+llaves_taller_*.csv
+__pycache__/
+*.pyc
+.venv/

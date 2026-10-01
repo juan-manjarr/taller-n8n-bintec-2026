@@ -1,0 +1,513 @@
+{
+  "name": "Flujo bancario multiagente - Bintec 2026",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "solicitud-bancaria",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "485e8ff0-a85f-43ca-97fd-ef917deb7cc8",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        224
+      ],
+      "webhookId": "solicitud-bancaria-taller"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "customer_id",
+              "type": "string",
+              "value": "={{ $json.body.customer_id }}"
+            },
+            {
+              "id": "a2",
+              "name": "customer_name",
+              "type": "string",
+              "value": "={{ $json.body.customer_name }}"
+            },
+            {
+              "id": "a3",
+              "name": "requested_amount",
+              "type": "number",
+              "value": "={{ $json.body.requested_amount }}"
+            },
+            {
+              "id": "a4",
+              "name": "term_months",
+              "type": "number",
+              "value": "={{ $json.body.term_months }}"
+            },
+            {
+              "id": "a5",
+              "name": "channel",
+              "type": "string",
+              "value": "={{ $json.body.channel }}"
+            },
+            {
+              "id": "a6",
+              "name": "ip",
+              "type": "string",
+              "value": "={{ $json.body.ip }}"
+            },
+            {
+              "id": "a7",
+              "name": "device_id",
+              "type": "string",
+              "value": "={{ $json.body.device_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4ffdf95-d42d-471b-9d89-79ca34d1dee2",
+      "name": "Preparar payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://risk-api:8000/score",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ customer_id: $json.customer_id, requested_amount: $json.requested_amount, term_months: $json.term_months }) }}",
+        "options": {}
+      },
+      "id": "a6a62e7b-ae1e-42e2-a700-f720a980453e",
+      "name": "HTTP Request - Risk API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fraud-api:8000/check",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ customer_id: $json.customer_id, ip: $json.ip, channel: $json.channel, amount: $json.requested_amount, device_id: $json.device_id }) }}",
+        "options": {}
+      },
+      "id": "0c345e87-0ba1-4e12-a908-cec355b44132",
+      "name": "HTTP Request - Fraud API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://crm-api:8000/profile",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ customer_id: $json.customer_id }) }}",
+        "options": {}
+      },
+      "id": "567de28c-6400-4f23-bae5-d8cbcfa13386",
+      "name": "HTTP Request - CRM API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "id": "d35f0af9-b085-44fb-a046-200511c10502",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        256,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// El Merge de arriba junta Risk + Fraud + CRM en un solo objeto plano.\n// Aqui lo reordenamos en la misma forma anidada que usa el resto del flujo.\nconst flat = $json;\n\nreturn [\n  {\n    json: {\n      cliente: {\n        customer_id: flat.customer_id,\n        customer_name: flat.customer_name,\n        segment: flat.segment,\n        monthly_income: flat.monthly_income,\n        employment: flat.employment,\n        tenure_months: flat.tenure_months,\n        product_history: flat.product_history,\n      },\n      riesgo: {\n        customer_id: flat.customer_id,\n        credit_score: flat.credit_score,\n        risk_level: flat.risk_level,\n        approved_limit: flat.approved_limit,\n        recommended_term_months: flat.recommended_term_months,\n      },\n      fraude: {\n        customer_id: flat.customer_id,\n        fraud_risk_score: flat.fraud_risk_score,\n        is_high_risk: flat.is_high_risk,\n        alerts: flat.alerts,\n      },\n    },\n  },\n];"
+      },
+      "id": "e93ad0c6-fa81-44af-b07a-2a3a0eede234",
+      "name": "Combinar respuestas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.LLM_BASE_URL.trim().replace(/\\/+$/, '') }}/v1beta/models/{{ $env.LLM_MODEL }}:generateContent",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ system_instruction: { parts: [{ text: \"Eres un agente bancario experto en riesgo y atención al cliente. Tu misión es revisar la información financiera y de seguridad de un cliente para decidir si la solicitud puede ser aprobada, rechazada o requiere revisión manual. Revisa los datos del cliente, el score de riesgo, la evaluación de fraude y la capacidad de endeudamiento. El campo decision DEBE ser exactamente uno de estos cuatro valores, sin variaciones: APROBADO, APROBADO_CON_RESTRICCIONES, RECHAZADO, PENDIENTE_REVISION_HUMANA. Usa APROBADO solo cuando no exista ninguna alerta de fraude activa (alerts.suspicious_ip, alerts.high_amount, alerts.risky_channel todas en false) y el monto aprobado sea igual al límite completo. Usa APROBADO_CON_RESTRICCIONES cuando el riesgo sea bajo o medio pero exista al menos una alerta de fraude activa, o cuando el monto aprobado sea menor al solicitado. Usa RECHAZADO cuando el riesgo sea alto y no proceda ninguna aprobación. Usa PENDIENTE_REVISION_HUMANA solo si tú mismo consideras que el caso es ambiguo y requiere que un humano decida. Devuelve un resultado con: decisión, razón, monto sugerido, riesgo y mensaje final para el cliente. Hazlo con lenguaje claro, conservador y orientado a la seguridad. Responde ÚNICAMENTE con un objeto JSON válido (sin texto adicional, sin markdown) con las claves: decision, risk_level, approved_amount, reason, human_review, customer_message.\" }] }, contents: [ { parts: [ { text: JSON.stringify($json) } ] } ] }) }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "={{ $env.LLM_API_KEY.trim() }}"
+            }
+          ]
+        }
+      },
+      "id": "ef6e2bf2-33b0-4b26-95ce-34e7774d825b",
+      "name": "Gemini Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        224
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gemini devuelve { candidates: [ { content: { parts: [ { text: '...' } ] } } ], ... }\n// El texto es el JSON que le pedimos al agente en el prompt.\nlet raw = $json.candidates[0].content.parts[0].text.trim();\n\n// Por si el modelo lo envuelve en un bloque de código markdown\nif (raw.startsWith('```')) {\n  raw = raw.replace(/^```(json)?/, '').replace(/```$/, '').trim();\n}\n\nconst parsed = JSON.parse(raw);\nreturn [{ json: parsed }];"
+      },
+      "id": "bd687bc5-0ddd-496b-b8a2-9ccbb2640720",
+      "name": "Parsear respuesta del agente",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Paso 7 - Trazabilidad y auditoría.\n// Arma el registro completo de la decisión. Reemplaza el console.log\n// de abajo por un nodo real (Postgres, Elasticsearch, etc.) cuando\n// tengas esa base de datos lista; mientras tanto, cada ejecución queda\n// visible en n8n -> Executions con este objeto en el log.\nconst combinado = $('Combinar respuestas').item.json;\nconst decision = $json;\n\nconst audit = {\n  request_id: `${$workflow.id}-${Date.now()}`,\n  timestamp: new Date().toISOString(),\n  customer_id: combinado.cliente.customer_id,\n  risk_response: combinado.riesgo,\n  fraud_response: combinado.fraude,\n  crm_response: combinado.cliente,\n  // modelo que realmente respondió (Gemini o el gateway del taller lo informan en modelVersion)\n  llm_model: $('Gemini Agent').item.json.modelVersion ?? $env.LLM_MODEL,\n  decision: decision.decision,\n  human_review: decision.human_review,\n};\n\n// TODO: inserta 'audit' en tu tabla/índice de trazabilidad real.\nconsole.log('AUDITORIA:', JSON.stringify(audit));\n\nreturn [{ json: decision }];"
+      },
+      "id": "440417d6-a179-40a2-90f9-ccfa6e4bde64",
+      "name": "Registro de auditoría (trazabilidad)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Guardrail combinado: un monto alto por si solo no basta para forzar\n// revision humana si el riesgo es bajo; solo cuenta cuando coincide con\n// riesgo ALTO. Un fraude alto siempre fuerza revision, sin importar el monto.\nconst decision = $json;\nconst fraude = $('Combinar respuestas').item.json.fraude;\n\nconst montoAltoYRiesgoAlto = decision.approved_amount > 10000000 && decision.risk_level === 'ALTO';\nconst fraudeAlto = fraude.fraud_risk_score >= 45;\n\nconst needs_human_review = montoAltoYRiesgoAlto || fraudeAlto;\n\nreturn [{ json: { ...decision, needs_human_review } }];"
+      },
+      "id": "c29b2abb-ad3d-438a-9c18-bbb94922867d",
+      "name": "Calcular guardrail",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.needs_human_review }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "22a43b76-5ed9-431f-950a-b3529b8071bd",
+      "name": "Guardrail: ¿necesita revisión humana?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1552,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "human_review",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "id": "b2",
+              "name": "decision",
+              "type": "string",
+              "value": "PENDIENTE_REVISION_HUMANA"
+            },
+            {
+              "id": "b3",
+              "name": "customer_message",
+              "type": "string",
+              "value": "Tu solicitud está siendo revisada por nuestro equipo de riesgo. Te contactaremos pronto con una respuesta."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "621854b9-bbec-4fcc-ab0e-4b7af3b24ed8",
+      "name": "Marcar para revisión humana",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        80
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2e4973f1-bc9d-4529-bf59-4094302b1086",
+      "name": "Notificar equipo de riesgo (Slack / Email)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        64
+      ],
+      "notes": "Placeholder: reemplaza este nodo por Slack, Gmail u otro canal real para avisar al equipo de riesgo."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "0b7c2d2c-0600-4b86-a822-52d2b6c4dfae",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2112,
+        256
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Preparar payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Risk API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request - Fraud API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request - CRM API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Risk API": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Fraud API": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request - CRM API": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Combinar respuestas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combinar respuestas": {
+      "main": [
+        [
+          {
+            "node": "Gemini Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Agent": {
+      "main": [
+        [
+          {
+            "node": "Parsear respuesta del agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear respuesta del agente": {
+      "main": [
+        [
+          {
+            "node": "Registro de auditoría (trazabilidad)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registro de auditoría (trazabilidad)": {
+      "main": [
+        [
+          {
+            "node": "Calcular guardrail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular guardrail": {
+      "main": [
+        [
+          {
+            "node": "Guardrail: ¿necesita revisión humana?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrail: ¿necesita revisión humana?": {
+      "main": [
+        [
+          {
+            "node": "Marcar para revisión humana",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar para revisión humana": {
+      "main": [
+        [
+          {
+            "node": "Notificar equipo de riesgo (Slack / Email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificar equipo de riesgo (Slack / Email)": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7d2c48d2-6881-4d7e-9b31-87edea0b10d1",
+  "nodeGroups": [],
+  "id": "nULpwXFN1CVUvBhx",
+  "tags": [],
+  "pinData": {}
+}

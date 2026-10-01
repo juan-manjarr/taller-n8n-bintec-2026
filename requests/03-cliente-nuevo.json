@@ -1,0 +1,9 @@
+{
+  "customer_id": "CLI-000999",
+  "customer_name": "Cliente Nuevo",
+  "requested_amount": 3000000,
+  "term_months": 12,
+  "channel": "web",
+  "ip": "181.50.3.20",
+  "device_id": "DEV-WEB-123"
+}

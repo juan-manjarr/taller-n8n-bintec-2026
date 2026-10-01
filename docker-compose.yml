@@ -1,0 +1,82 @@
+# Taller Bintec 2026 - Entorno para construir el flujo bancario multiagente con n8n.
+# n8n arranca vacío: el flujo lo armas tú siguiendo la guía (docs/).
+#
+#   1. Copia .env.example a .env y completa LLM_BASE_URL y LLM_API_KEY
+#   2. docker compose up -d
+#   3. Abre http://localhost:5678  (admin@bintec.local / Bintec2026!)
+
+x-mock-service: &mock-service
+  # Si la imagen no está publicada, Compose la construye desde ./mock_services
+  image: ${REGISTRY:-docker.io/jcmanjar}/taller-n8n-bintec2026:${TAG:-1.0.0}
+  build:
+    context: ./mock_services
+  restart: unless-stopped
+
+services:
+  n8n:
+    image: n8nio/n8n:${N8N_VERSION:-2.41.4}
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    environment:
+      # --- Modelo (LLM): lo único que debes configurar, en .env -----------------
+      LLM_BASE_URL: ${LLM_BASE_URL:?Falta LLM_BASE_URL en el archivo .env}
+      LLM_API_KEY: ${LLM_API_KEY:?Falta LLM_API_KEY en el archivo .env}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash-lite}
+      # El flujo lee las tres variables anteriores con $env; n8n 2.x lo bloquea por defecto
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      # --- n8n -------------------------------------------------------------------
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:-bintec2026-taller-cambia-esta-clave}
+      N8N_SECURE_COOKIE: "false"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_WEBHOOK_URL: http://localhost:${N8N_PORT:-5678}/
+      GENERIC_TIMEZONE: America/Bogota
+      TZ: America/Bogota
+      # Usuario creado automáticamente (sin pantalla de registro)
+      N8N_INSTANCE_OWNER_MANAGED_BY_ENV: "true"
+      N8N_INSTANCE_OWNER_EMAIL: admin@bintec.local
+      N8N_INSTANCE_OWNER_FIRST_NAME: Bintec
+      N8N_INSTANCE_OWNER_LAST_NAME: Admin
+      # Hash bcrypt de "Bintec2026!" ($$ = $ literal en Compose)
+      N8N_INSTANCE_OWNER_PASSWORD_HASH: $$2a$$10$$4VcyXJ.Tm3K2qiO0YHHUgOJ34yexYMuIf45oLJ2SZA.clq2cMzU66
+    volumes:
+      - n8n_data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 10
+    depends_on:
+      risk-api:
+        condition: service_healthy
+      fraud-api:
+        condition: service_healthy
+      crm-api:
+        condition: service_healthy
+
+  # Servicios de negocio simulados (FastAPI). Documentación en http://localhost:8001/docs, 8002 y 8003.
+  # Desde n8n se llaman por su nombre: http://risk-api:8000, http://fraud-api:8000, http://crm-api:8000
+  risk-api:
+    <<: *mock-service
+    environment:
+      - SERVICE=risk
+    ports:
+      - "${RISK_PORT:-8001}:8000"
+
+  fraud-api:
+    <<: *mock-service
+    environment:
+      - SERVICE=fraud
+    ports:
+      - "${FRAUD_PORT:-8002}:8000"
+
+  crm-api:
+    <<: *mock-service
+    environment:
+      - SERVICE=crm
+    ports:
+      - "${CRM_PORT:-8003}:8000"
+
+volumes:
+  n8n_data:

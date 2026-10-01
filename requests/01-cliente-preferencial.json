@@ -1,0 +1,9 @@
+{
+  "customer_id": "CLI-893201",
+  "customer_name": "Mariana Gómez",
+  "requested_amount": 5000000,
+  "term_months": 24,
+  "channel": "app",
+  "ip": "190.24.10.5",
+  "device_id": "DEV-IPHONE-001"
+}

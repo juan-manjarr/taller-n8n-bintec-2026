@@ -1,0 +1,9 @@
+{
+  "customer_id": "CLI-440102",
+  "customer_name": "Andrés Ramírez",
+  "requested_amount": 9500000,
+  "term_months": 48,
+  "channel": "sms",
+  "ip": "185.220.101.7",
+  "device_id": "DEV-ANDROID-777"
+}
