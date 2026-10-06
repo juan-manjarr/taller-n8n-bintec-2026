@@ -1,0 +1,20 @@
+{
+  "customer_id": "CLI-893201",
+  "customer_name": "Mariana Gómez",
+  "requested_amount": 35000000,
+  "term_months": 36,
+  "channel": "whatsapp",
+  "ip": "186.28.190.44",
+  "device_id": "android-789"
+}
+
+
+{
+  "customer_id": "CLI-TEST",
+  "customer_name": "Test Usuario",
+  "requested_amount": 50000000,
+  "term_months": 60,
+  "channel": "sms",
+  "ip": "185.100.20.1",
+  "device_id": "android-789"
+}

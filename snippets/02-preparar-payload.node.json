@@ -1,0 +1,9 @@
+{
+  "customer_id": "{{ $json.body.customer_id }}",
+  "customer_name": "{{ $json.body.customer_name }}",
+  "requested_amount": "{{ $json.body.requested_amount }}",
+  "term_months": "{{ $json.body.term_months }}",
+  "channel": "{{ $json.body.channel }}",
+  "ip": "{{ $json.body.ip }}",
+  "device_id": "{{ $json.body.device_id }}"
+}

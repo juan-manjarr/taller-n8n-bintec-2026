@@ -1,0 +1,3 @@
+http://fraud-api:8000/check
+
+{{ JSON.stringify({ customer_id: $json.customer_id, ip: $json.ip, channel: $json.channel, amount: $json.requested_amount, device_id: $json.device_id }) }}
