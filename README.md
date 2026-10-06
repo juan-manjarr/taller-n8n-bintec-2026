@@ -4,6 +4,16 @@ Entorno para el taller: **n8n vacío** y tres servicios de negocio simulados (Ri
 El flujo lo construyes tú siguiendo la guía; para el modelo solo tienes que indicar **la URL y la
 llave** en un archivo.
 
+**Guías** (en `docs/`):
+- [`GUIA-PASO-A-PASO.pdf`](docs/GUIA-PASO-A-PASO.pdf) ([versión web](docs/GUIA-PASO-A-PASO.md)):
+  el flujo clic a clic, con capturas, para quien usa n8n por primera vez. Ya está adaptada a este
+  repositorio.
+- [`Taller_Bintec_Guia_Completa.pdf`](docs/Taller_Bintec_Guia_Completa.pdf): la guía original del
+  taller, con los ajustes de la sección 2 de este README.
+
+Puedes trabajar **con Docker en tu equipo** (sección 1A) o, si no puedes instalarlo, **en GitHub
+Codespaces** desde el navegador (sección 1B).
+
 ```
 Cliente ──POST──▶ n8n webhook /solicitud-bancaria
                     ├─▶ risk-api   (score crediticio)
@@ -15,11 +25,12 @@ Cliente ──POST──▶ n8n webhook /solicitud-bancaria
 
 ## Requisitos
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine con Compose v2), en ejecución.
-- Git.
 - La URL y la llave del modelo: las del taller (te llegan por correo) o tu propia API key de Gemini.
+- **Con Docker (1A):** [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker
+  Engine con Compose v2) en ejecución, y Git.
+- **Sin Docker (1B):** una cuenta de GitHub y un navegador.
 
-## 1. Puesta en marcha
+## 1A. Puesta en marcha con Docker
 
 **Clona el repositorio**
 
@@ -59,9 +70,42 @@ La primera vez descarga las imágenes y tarda uno o dos minutos. Está listo cua
 
 http://localhost:5678 — usuario `admin@bintec.local`, contraseña `Bintec2026!`
 
+## 1B. Puesta en marcha sin Docker: GitHub Codespaces
+
+El repositorio incluye una configuración de Codespaces (`.devcontainer/`): GitHub crea una máquina
+en la nube con este mismo entorno (el mismo `docker-compose.yml`) y la usas desde el navegador.
+
+1. En esta página: **Code → Codespaces → Create codespace on main**.
+2. Se abre VS Code en el navegador. La primera vez tarda 3–5 minutos (descarga las imágenes); al
+   terminar, la terminal muestra *"Imágenes descargadas. Falta un paso"*.
+3. En el explorador de archivos abre **`.env`** (ya viene creado), completa `LLM_BASE_URL` y
+   `LLM_API_KEY` como en la tabla de 1A y guarda (`Ctrl+S`).
+4. En la terminal del codespace ejecuta:
+
+   ```bash
+   docker compose up -d
+   ```
+
+5. Abre la pestaña **PORTS**, fila **n8n (5678)**, ícono del globo: n8n se abre en
+   `https://<tu-codespace>-5678.app.github.dev`. Usuario `admin@bintec.local`, contraseña `Bintec2026!`.
+
+En Codespaces:
+- Los comandos de este README van en la **terminal del codespace** y son los de **bash**
+  (`./scripts/test-flow.sh`). Las URLs de webhook que muestra n8n (`http://localhost:5678/...`)
+  funcionan desde esa terminal.
+- **Deja el puerto 5678 en *Private*** (es lo predeterminado). Si lo haces público, cualquiera con la
+  URL podría entrar con la contraseña del taller.
+- El codespace se suspende tras 30 minutos sin uso; al reabrirlo desde https://github.com/codespaces
+  los servicios se levantan solos y tu flujo se conserva.
+- Las cuentas personales de GitHub incluyen horas gratuitas de Codespaces al mes. Al terminar el
+  taller, elimina el codespace en https://github.com/codespaces.
+
 ## 2. Construye el flujo
 
-Sigue `docs/Taller_Bintec_Guia_Completa.pdf` (sección 7, 15 nodos) con estos ajustes:
+La forma más fácil es seguir [`docs/GUIA-PASO-A-PASO.pdf`](docs/GUIA-PASO-A-PASO.pdf), que ya
+incluye todo lo de esta sección. Si sigues la guía original
+[`docs/Taller_Bintec_Guia_Completa.pdf`](docs/Taller_Bintec_Guia_Completa.pdf) (sección 7, 15 nodos),
+aplica estos ajustes:
 
 **Servicios de negocio.** Desde n8n se llaman por su nombre de red:
 `http://risk-api:8000/score`, `http://fraud-api:8000/check` y `http://crm-api:8000/profile`.
@@ -86,7 +130,8 @@ la respuesta del modelo llega en `candidates[0].content.parts[0].text` con cualq
 
 ## 3. Prueba el flujo
 
-Mientras lo construyes: pulsa *Execute workflow* en el editor (queda escuchando una solicitud) y envía:
+Mientras lo construyes: pulsa *Execute workflow* en el editor (queda escuchando una solicitud) y envía
+(en Codespaces, desde la terminal del codespace con el comando de bash):
 
 ```bash
 WEBHOOK_PATH=webhook-test ./scripts/test-flow.sh requests/01-cliente-preferencial.json
@@ -131,6 +176,8 @@ No requiere credenciales: usa la URL y la llave de tu `.env`.
 | `The requested webhook … is not registered` | El flujo no está publicado, o usaste la URL de producción mientras probabas (usa `webhook-test`). |
 | `port is already allocated` | El puerto 5678 está ocupado: define `N8N_PORT=5679` en `.env` y usa ese puerto en el navegador (y `BASE_URL=http://localhost:5679` con los scripts). |
 | Cambié `.env` y no pasa nada | Ejecuta de nuevo `docker compose up -d` para que n8n tome los valores. |
+| Codespaces: n8n no aparece en PORTS | Aún no ejecutaste `docker compose up -d` (paso 4 de 1B), o falló porque `.env` está incompleto. |
+| Codespaces: el editor de n8n dice *Connection lost* | Ábrelo desde PORTS → n8n (5678) → globo, con el puerto en *Private*. |
 
 Logs: `docker compose logs -f n8n`
 
@@ -147,7 +194,10 @@ docker compose down -v          # detiene y borra todo (n8n vuelve a quedar vac�
 .
 ├── docker-compose.yml          # n8n (vacío) + 3 servicios simulados
 ├── .env.example                # plantilla de configuración (cópiala a .env)
-├── docs/Taller_Bintec_Guia_Completa.pdf   # guía para construir el flujo nodo por nodo
+├── .devcontainer/              # configuración de GitHub Codespaces (sección 1B)
+├── docs/
+│   ├── GUIA-PASO-A-PASO.pdf    # guía clic a clic con capturas (y .md + img/ para verla en GitHub)
+│   └── Taller_Bintec_Guia_Completa.pdf   # guía original del taller
 ├── mock_services/              # Risk, Fraud y CRM (FastAPI)
 ├── requests/                   # solicitudes de ejemplo
 ├── scripts/test-flow.{sh,ps1}  # envía las solicitudes al webhook

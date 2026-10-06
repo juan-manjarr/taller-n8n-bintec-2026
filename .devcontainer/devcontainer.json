@@ -1,0 +1,32 @@
+{
+  // Entorno del taller en GitHub Codespaces, para quien no puede usar Docker en su equipo.
+  // Corre el mismo docker-compose.yml del repositorio con Docker dentro del codespace
+  // (docker-in-docker): los comandos son los mismos del README.
+  "name": "Taller Bintec 2026 (n8n + servicios mock)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  // n8n + 3 servicios mock caben en la máquina mínima (2 núcleos, 8 GB)
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb"
+  },
+  // post-create: crea .env, descarga las imágenes y, si .env ya tiene URL y llave, levanta el entorno.
+  // post-start: lo vuelve a levantar cuando el codespace se reanuda tras suspenderse.
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postStartCommand": "bash .devcontainer/post-start.sh",
+  "forwardPorts": [5678, 8001, 8002, 8003],
+  "portsAttributes": {
+    "5678": { "label": "n8n", "onAutoForward": "openBrowser" },
+    "8001": { "label": "Risk API", "onAutoForward": "silent" },
+    "8002": { "label": "Fraud API", "onAutoForward": "silent" },
+    "8003": { "label": "CRM API", "onAutoForward": "silent" }
+  },
+  "otherPortsAttributes": { "onAutoForward": "ignore" },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    }
+  }
+}
