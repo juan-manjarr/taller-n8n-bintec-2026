@@ -1,1 +1,0 @@
-{{ $env.LLM_BASE_URL.trim().replace(/\/+$/, '') }}/v1beta/models/{{ $env.LLM_MODEL }}:generateContent
