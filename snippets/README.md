@@ -1,7 +1,9 @@
 # snippets/
 
 Texto plano para copiar al armar el flujo en n8n.
-Todo sale literalmente de `Flujo_bancario_Funciona.json` (el flujo que funciona), sin retocar.
+Todo sale literalmente de `solucion/flujo-bancario-multiagente.json` (el flujo verificado), sin retocar.
+La guía paso a paso (`docs/GUIA-PASO-A-PASO.pdf`) y el video (`docs/VIDEO-PASO-A-PASO.mp4`) indican
+en cada nodo qué archivo de esta carpeta usar.
 
 ## Por que existe esta carpeta
 
@@ -24,6 +26,7 @@ Los archivos de esta carpeta no tienen nada de eso — son bytes exactos del flu
    sigue en Fixed y n8n lo trata como texto literal.
 4. **Una linea larguisima no es un error.**
    Los `.txt` son UNA sola linea. El body de Gemini tiene 1389 chars en una linea.
+   Copia el archivo completo (Ctrl+A, Ctrl+C): no trae nada mas que el valor del campo.
    No la partas y no agregues salto de linea al final.
 5. **Dos nombres de nodo son obligatorios**, porque otros nodos los citan por nombre:
    - `Combinar respuestas`  (Nodo 07)
@@ -48,7 +51,9 @@ Los archivos de esta carpeta no tienen nada de eso — son bytes exactos del flu
 | 09 Code            | `09-parsear-respuesta.js`   | campo JavaScript            | Code       |
 | 10 Code            | `10-auditoria.js`           | campo JavaScript            | Code       |
 | 11 Code            | `11-guardrail.js`           | campo JavaScript            | Code       |
+| 12 If              | `12-if-body.txt`            | value1 de la condicion     | Expression |
 | 13 Set             | `13-mensaje-revision.txt`   | valor del campo `customer_message` | Fixed |
+| 15 Respond to Webhook | `14-respond-webhook.txt` | Response Body              | Expression |
 
 En los `.js`, VS Code puede subrayar `$json`, `$workflow` o `return` en rojo.
 Es normal: son variables que solo existen dentro de n8n.
@@ -67,8 +72,8 @@ Abre `.env` y completa:
 
 | Variable | Valor | Ejemplo |
 |----------|-------|---------|
-| `LLM_API_KEY`  | Tu API key de Gemini (empieza con AIza) | `AIzaSy...` |
-| `LLM_BASE_URL` | URL base de la API de Google — **sin `/` al final** | `https://generativelanguage.googleapis.com` |
+| `LLM_API_KEY`  | La llave del taller (del correo) o tu API key de Gemini | `sk-bintec-...` o `AIzaSy...` |
+| `LLM_BASE_URL` | La URL del correo, o la de la API de Google — **sin `/` al final** | `https://generativelanguage.googleapis.com` |
 | `LLM_MODEL`    | Modelo a usar | `gemini-3.5-flash-lite` |
 
 **Ojo con LLM_BASE_URL:** la expresion del Nodo 08 agrega `/v1beta/models/...` por su cuenta.
@@ -86,8 +91,11 @@ Valor correcto: `https://generativelanguage.googleapis.com`
 |--------------------|------------------------------------------|
 | HTTP Method        | `POST`                                   |
 | Path               | `solicitud-bancaria`                     |
-| Respond            | `Using 'Respond to Webhook' Node`        |
+| Respond            | `Immediately` mientras construyes; `Using 'Respond to Webhook' Node` al agregar el Nodo 15 |
 | Authentication     | None                                     |
+
+Si eliges `Using 'Respond to Webhook' Node` antes de que exista el Nodo 15, la prueba del
+Webhook falla con *"No Respond to Webhook node found in the workflow"*.
 
 ---
 
@@ -194,7 +202,7 @@ Borra el codigo de ejemplo y pega el contenido de `07-combinar-respuestas.js`.
 
 | Campo            | Valor |
 |------------------|-------|
-| On Error         | `Retry on Fail` |
+| Retry On Fail    | activado |
 | Max Tries        | `3`   |
 | Wait Between Tries | `2000` ms |
 
@@ -225,7 +233,7 @@ Pega el contenido de `11-guardrail.js`.
 
 | Campo        | Valor |
 |--------------|-------|
-| Value 1 (Expression) | `{{ $json.needs_human_review }}` |
+| Value 1 (Expression) | `{{ $json.needs_human_review }}` (o copia `12-if-body.txt`) |
 | Operator     | Boolean → `is true` |
 | Combinator   | `AND` (solo hay una condicion, da igual) |
 
@@ -258,7 +266,7 @@ cuando tengas listo ese canal.
 | Campo           | Valor                    |
 |-----------------|--------------------------|
 | Respond With    | `JSON`                   |
-| Response Body (Expression) | `{{ $json }}` |
+| Response Body (Expression) | `{{ $json }}` (o copia `14-respond-webhook.txt`) |
 
 ---
 

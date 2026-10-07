@@ -1,3 +1,1 @@
-http://crm-api:8000/profile
-
 {{ JSON.stringify({ customer_id: $json.customer_id }) }}

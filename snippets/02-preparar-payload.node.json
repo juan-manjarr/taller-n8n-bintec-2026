@@ -1,9 +1,63 @@
 {
-  "customer_id": "{{ $json.body.customer_id }}",
-  "customer_name": "{{ $json.body.customer_name }}",
-  "requested_amount": "{{ $json.body.requested_amount }}",
-  "term_months": "{{ $json.body.term_months }}",
-  "channel": "{{ $json.body.channel }}",
-  "ip": "{{ $json.body.ip }}",
-  "device_id": "{{ $json.body.device_id }}"
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "customer_id",
+              "type": "string",
+              "value": "={{ $json.body.customer_id }}"
+            },
+            {
+              "id": "a2",
+              "name": "customer_name",
+              "type": "string",
+              "value": "={{ $json.body.customer_name }}"
+            },
+            {
+              "id": "a3",
+              "name": "requested_amount",
+              "type": "number",
+              "value": "={{ $json.body.requested_amount }}"
+            },
+            {
+              "id": "a4",
+              "name": "term_months",
+              "type": "number",
+              "value": "={{ $json.body.term_months }}"
+            },
+            {
+              "id": "a5",
+              "name": "channel",
+              "type": "string",
+              "value": "={{ $json.body.channel }}"
+            },
+            {
+              "id": "a6",
+              "name": "ip",
+              "type": "string",
+              "value": "={{ $json.body.ip }}"
+            },
+            {
+              "id": "a7",
+              "name": "device_id",
+              "type": "string",
+              "value": "={{ $json.body.device_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Preparar payload"
+    }
+  ],
+  "connections": {}
 }
