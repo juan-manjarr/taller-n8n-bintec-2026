@@ -12,6 +12,8 @@ llave** en un archivo.
   construido en n8n de principio a fin, ejecutado y publicado. Capítulos: 0:00 Webhook · 1:05 Preparar
   payload · 1:59 Risk, Fraud y CRM · 3:50 Merge y Combinar respuestas · 4:40 Gemini Agent ·
   5:46 Parsear, auditoría y guardrail · 7:03 If, revisión humana y respuesta · 9:08 Probar y publicar.
+- [`snippets/`](snippets/): el código, los bodies JSON y el prompt de cada nodo en texto plano,
+  listos para copiar sin errores (la guía y el video indican qué archivo va en cada nodo).
 - [`Taller_Bintec_Guia_Completa.pdf`](docs/Taller_Bintec_Guia_Completa.pdf): la guía original del
   taller, con los ajustes de la sección 2 de este README.
 
@@ -94,6 +96,9 @@ en la nube con este mismo entorno (el mismo `docker-compose.yml`) y la usas desd
    `https://<tu-codespace>-5678.app.github.dev`. Usuario `admin@bintec.local`, contraseña `Bintec2026!`.
 
 En Codespaces:
+- En el codespace, `docker compose` agrega solo un nginx delante de n8n (`n8n-proxy`): corrige los
+  encabezados del reenvío de puertos de GitHub para que el editor no pierda la conexión en vivo
+  (*Connection lost*). Usa siempre `docker compose up -d` sin `-f`, para que se aplique.
 - Los comandos de este README van en la **terminal del codespace** y son los de **bash**
   (`./scripts/test-flow.sh`). Las URLs de webhook que muestra n8n (`http://localhost:5678/...`)
   funcionan desde esa terminal.
@@ -181,7 +186,8 @@ No requiere credenciales: usa la URL y la llave de tu `.env`.
 | `port is already allocated` | El puerto 5678 está ocupado: define `N8N_PORT=5679` en `.env` y usa ese puerto en el navegador (y `BASE_URL=http://localhost:5679` con los scripts). |
 | Cambié `.env` y no pasa nada | Ejecuta de nuevo `docker compose up -d` para que n8n tome los valores. |
 | Codespaces: n8n no aparece en PORTS | Aún no ejecutaste `docker compose up -d` (paso 4 de 1B), o falló porque `.env` está incompleto. |
-| Codespaces: el editor de n8n dice *Connection lost* | Ábrelo desde PORTS → n8n (5678) → globo, con el puerto en *Private*. |
+| Codespaces: el editor de n8n dice *Connection lost* todo el tiempo | El codespace se creó antes de la corrección de `.devcontainer/` (nginx delante de n8n). Actualiza el repositorio (`git pull`) y ejecuta *Rebuild Container* (F1 → `Codespaces: Rebuild Container`), o crea un codespace nuevo. Comprueba con `docker compose ps` que aparece el servicio `n8n-proxy`. |
+| Codespaces: *Connection lost* aparece un segundo y desaparece | El reenvío de puertos de GitHub puede cerrar la conexión en vivo cada cierto tiempo; n8n reconecta solo y no se pierde nada. |
 
 Logs: `docker compose logs -f n8n`
 
@@ -206,6 +212,7 @@ docker compose down -v          # detiene y borra todo (n8n vuelve a quedar vac�
 ├── mock_services/              # Risk, Fraud y CRM (FastAPI)
 ├── requests/                   # solicitudes de ejemplo
 ├── scripts/test-flow.{sh,ps1}  # envía las solicitudes al webhook
+├── snippets/                   # valores de cada nodo en texto plano, para copiar
 └── solucion/                   # flujo terminado, para importar al final
 ```
 

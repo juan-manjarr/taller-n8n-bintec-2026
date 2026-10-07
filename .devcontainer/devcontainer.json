@@ -12,6 +12,11 @@
     "cpus": 2,
     "memory": "8gb"
   },
+  // En el codespace, "docker compose" combina docker-compose.yml con el ajuste de Codespaces:
+  // un nginx delante de n8n que evita el "Connection lost" del editor (ver nginx-n8n.conf).
+  "containerEnv": {
+    "COMPOSE_FILE": "${containerWorkspaceFolder}/docker-compose.yml:${containerWorkspaceFolder}/.devcontainer/docker-compose.codespaces.yml"
+  },
   // post-create: crea .env, descarga las imágenes y, si .env ya tiene URL y llave, levanta el entorno.
   // post-start: lo vuelve a levantar cuando el codespace se reanuda tras suspenderse.
   "postCreateCommand": "bash .devcontainer/post-create.sh",
