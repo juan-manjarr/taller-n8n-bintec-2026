@@ -8,6 +8,10 @@ llave** en un archivo.
 - [`GUIA-PASO-A-PASO.pdf`](docs/GUIA-PASO-A-PASO.pdf) ([versión web](docs/GUIA-PASO-A-PASO.md)):
   el flujo clic a clic, con capturas, para quien usa n8n por primera vez. Ya está adaptada a este
   repositorio.
+- [`VIDEO-PASO-A-PASO.mp4`](docs/VIDEO-PASO-A-PASO.mp4) (10:46, sin audio, con subtítulos): el flujo
+  construido en n8n de principio a fin, ejecutado y publicado. Capítulos: 0:00 Webhook · 1:05 Preparar
+  payload · 1:59 Risk, Fraud y CRM · 3:50 Merge y Combinar respuestas · 4:40 Gemini Agent ·
+  5:46 Parsear, auditoría y guardrail · 7:03 If, revisión humana y respuesta · 9:08 Probar y publicar.
 - [`Taller_Bintec_Guia_Completa.pdf`](docs/Taller_Bintec_Guia_Completa.pdf): la guía original del
   taller, con los ajustes de la sección 2 de este README.
 
@@ -197,6 +201,7 @@ docker compose down -v          # detiene y borra todo (n8n vuelve a quedar vac�
 ├── .devcontainer/              # configuración de GitHub Codespaces (sección 1B)
 ├── docs/
 │   ├── GUIA-PASO-A-PASO.pdf    # guía clic a clic con capturas (y .md + img/ para verla en GitHub)
+│   ├── VIDEO-PASO-A-PASO.mp4   # el mismo proceso en video (10:46)
 │   └── Taller_Bintec_Guia_Completa.pdf   # guía original del taller
 ├── mock_services/              # Risk, Fraud y CRM (FastAPI)
 ├── requests/                   # solicitudes de ejemplo

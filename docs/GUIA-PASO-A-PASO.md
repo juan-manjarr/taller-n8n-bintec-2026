@@ -5,6 +5,11 @@ Esta guía es para quien **nunca ha usado n8n**. Arma el mismo flujo de 15 nodos
 capturas, adaptado a este repositorio. Cada paso dice qué buscar, qué escribir y qué deberías ver al
 ejecutar.
 
+> **Video:** el mismo proceso, de principio a fin, en [`VIDEO-PASO-A-PASO.mp4`](VIDEO-PASO-A-PASO.mp4)
+> (10:46). Capítulos: 0:00 Webhook · 1:05 Preparar payload · 1:59 Risk, Fraud y CRM · 3:50 Merge y
+> Combinar respuestas · 4:40 Gemini Agent · 5:46 Parsear, auditoría y guardrail · 7:03 If, revisión
+> humana y respuesta · 9:08 Probar y publicar.
+
 > **Diferencia con el PDF:** aquí la URL y la llave del modelo van en el archivo `.env`. Los pasos 5 y
 > 6 del PDF (crear la API key y la credencial de n8n) **no hacen falta**.
 
