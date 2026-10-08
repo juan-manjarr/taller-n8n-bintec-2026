@@ -9,10 +9,9 @@ llave** en un archivo.
   el flujo clic a clic, con capturas, para quien usa n8n por primera vez. Ya está adaptada a este
   repositorio. **No copies código desde los PDF**: al pegarlo en n8n quedan saltos de línea que lo
   rompen; cópialo desde `snippets/` o desde la versión web.
-- [`VIDEO-PASO-A-PASO.mp4`](docs/VIDEO-PASO-A-PASO.mp4) (10:46, sin audio, con subtítulos): el flujo
-  construido en n8n de principio a fin, ejecutado y publicado. Capítulos: 0:00 Webhook · 1:05 Preparar
-  payload · 1:59 Risk, Fraud y CRM · 3:50 Merge y Combinar respuestas · 4:40 Gemini Agent ·
-  5:46 Parsear, auditoría y guardrail · 7:03 If, revisión humana y respuesta · 9:08 Probar y publicar.
+- [`VIDEO-PASO-A-PASO.mp4`](docs/VIDEO-PASO-A-PASO.mp4) (12:41, narrado en español, con subtítulos):
+  el flujo construido en n8n de principio a fin, idéntico a `solucion/`, ejecutado y publicado.
+  Capítulos: 0:00 Webhook · 1:57 Preparar los datos · 2:27 Risk, Fraud y CRM · 4:46 Merge y Combinar respuestas · 5:54 Gemini Agent · 7:31 Parsear, auditoría y guardrail · 8:45 If, revisión humana y respuesta · 10:49 Probar y publicar.
 - [`snippets/`](snippets/): el código, los bodies JSON y el prompt de cada nodo en texto plano,
   listos para copiar sin errores (la guía y el video indican qué archivo va en cada nodo).
 - [`Taller_Bintec_Guia_Completa.pdf`](docs/Taller_Bintec_Guia_Completa.pdf): la guía original del
@@ -213,7 +212,7 @@ docker compose down -v          # detiene y borra todo (n8n vuelve a quedar vac�
 ├── .devcontainer/              # configuración de GitHub Codespaces (sección 1B)
 ├── docs/
 │   ├── GUIA-PASO-A-PASO.pdf    # guía clic a clic con capturas (y .md + img/ para verla en GitHub)
-│   ├── VIDEO-PASO-A-PASO.mp4   # el mismo proceso en video (10:46)
+│   ├── VIDEO-PASO-A-PASO.mp4   # el mismo proceso en video narrado (12:41)
 │   └── Taller_Bintec_Guia_Completa.pdf   # guía original del taller
 ├── mock_services/              # Risk, Fraud y CRM (FastAPI)
 ├── requests/                   # solicitudes de ejemplo

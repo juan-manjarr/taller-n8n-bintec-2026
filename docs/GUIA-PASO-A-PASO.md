@@ -5,10 +5,11 @@ Esta guía es para quien **nunca ha usado n8n**. Arma el mismo flujo de 15 nodos
 capturas, adaptado a este repositorio. Cada paso dice qué buscar, qué escribir y qué deberías ver al
 ejecutar.
 
-> **Video:** el mismo proceso, de principio a fin, en [`VIDEO-PASO-A-PASO.mp4`](VIDEO-PASO-A-PASO.mp4)
-> (10:46). Capítulos: 0:00 Webhook · 1:05 Preparar payload · 1:59 Risk, Fraud y CRM · 3:50 Merge y
-> Combinar respuestas · 4:40 Gemini Agent · 5:46 Parsear, auditoría y guardrail · 7:03 If, revisión
-> humana y respuesta · 9:08 Probar y publicar.
+> **Video:** el mismo proceso, de principio a fin y narrado en español, en
+> [`VIDEO-PASO-A-PASO.mp4`](VIDEO-PASO-A-PASO.mp4) (12:41). Capítulos: 0:00 Webhook · 1:57 Preparar los datos · 2:27 Risk, Fraud y CRM · 4:46 Merge y Combinar respuestas · 5:54 Gemini Agent · 7:31 Parsear, auditoría y guardrail · 8:45 If, revisión humana y respuesta · 10:49 Probar y publicar.
+> El video copia los valores desde `snippets/` y deja los nombres por defecto de n8n (`Edit Fields`,
+> `HTTP Request1`, `Code in JavaScript2`…), como la solución: los nombres que propone esta guía son
+> opcionales, salvo `Combinar respuestas` y `Gemini Agent`, que sí son obligatorios.
 
 > **⚠️ No copies código desde este PDF.** Al pegarlo en n8n, los saltos de línea del PDF quedan
 > dentro del código o de la expresión y el nodo se muestra con errores (texto en rojo, *SyntaxError*,
