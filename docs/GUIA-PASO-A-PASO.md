@@ -10,10 +10,12 @@ ejecutar.
 > Combinar respuestas · 4:40 Gemini Agent · 5:46 Parsear, auditoría y guardrail · 7:03 If, revisión
 > humana y respuesta · 9:08 Probar y publicar.
 
-> **Copia los valores largos desde la carpeta [`snippets/`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets)** del repositorio
-> (código, bodies JSON y el prompt de Gemini), no desde este PDF ni desde una página web: al copiar de
-> un PDF se parten líneas y se cuelan caracteres invisibles que n8n no detecta hasta ejecutar. En VS Code
-> o Codespaces abre el archivo, `Ctrl+A`, `Ctrl+C`. Cada paso indica qué archivo usar; el
+> **⚠️ No copies código desde este PDF.** Al pegarlo en n8n, los saltos de línea del PDF quedan
+> dentro del código o de la expresión y el nodo se muestra con errores (texto en rojo, *SyntaxError*,
+> *Unexpected token*), aunque se vea igual. Copia los valores largos (código, bodies JSON, prompt de
+> Gemini) desde la carpeta [`snippets/`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets) del repositorio, o desde la
+> [versión web de esta guía](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/docs/GUIA-PASO-A-PASO.md) con el botón de copiar de cada bloque. En VS Code o Codespaces:
+> abre el archivo, `Ctrl+A`, `Ctrl+C`. Cada paso indica qué archivo usar; el
 > [README de `snippets/`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/README.md) tiene todos los valores en tablas.
 
 > **Diferencia con el PDF:** aquí la URL y la llave del modelo van en el archivo `.env`. Los pasos 5 y
@@ -164,6 +166,12 @@ Abre http://localhost:5678 e inicia sesión con `admin@bintec.local` / `Bintec20
 
 ![Pantalla de inicio de sesión de n8n](img/guia/01-login.png)
 
+Al entrar puede aparecer la ventana **Build and debug faster with the n8n Assistant**. Haz clic en
+**Set up later in Settings** (no en *Get started*): el taller no usa el asistente de IA y la llave del
+taller no funciona con él.
+
+![Ventana del n8n Assistant: clic en Set up later in Settings](img/guia/01b-asistente-n8n.png)
+
 Verás la pantalla de inicio. **No uses "Build an agent"** (es el asistente de IA): el taller usa
 **Build a workflow**.
 
@@ -279,9 +287,9 @@ Este nodo saca los campos de `body` y los deja "planos" para los siguientes paso
    > Si prefieres escribir en vez de arrastrar: **Add Field**, escribe el nombre, elige el tipo y en el
    > valor escribe la expresión completa empezando por `{{`. n8n cambia el campo a modo *Expression*.
 
-   > **Atajo:** en vez de crear el nodo a mano, copia [`snippets/02-preparar-payload.node.json`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/02-preparar-payload.node.json), haz
-   > clic en un espacio vacío del lienzo y pega con `Ctrl+V`: aparece *Preparar payload* con los 7 campos y
-   > sus tipos. Solo falta conectarlo a la salida del Webhook.
+   > **Atajo (como en la solución):** en *Edit Fields* cambia **Mode** a `JSON`, pon el campo **JSON** en
+   > modo *Expression* y pega el contenido de [`snippets/02-preparar-payload.node.json`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/02-preparar-payload.node.json). Así los 7
+   > valores llegan como texto (también los montos); los servicios los aceptan igual.
 
 ---
 
@@ -312,7 +320,7 @@ en el campo **JSON** (empieza con `{{`, por eso queda en modo *Expression*).
 > **Ojo con la URL:** dentro de n8n los servicios se llaman por su nombre (`risk-api`) y puerto interno
 > `8000`. `localhost:8001` solo funciona desde tu navegador, no desde n8n.
 
-**JSON de Risk API:** — archivo [`snippets/03-risk-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/03-risk-body.txt):
+**JSON de Risk API:** — archivo [`snippets/03-risk-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/03-risk-body.txt) (la línea 1 es la URL; copia solo la última línea, el body):
 
 ```
 {{ JSON.stringify({ customer_id: $json.customer_id, requested_amount: $json.requested_amount, term_months: $json.term_months }) }}
@@ -320,7 +328,7 @@ en el campo **JSON** (empieza con `{{`, por eso queda en modo *Expression*).
 
 ![Configuración de HTTP Request - Risk API](img/guia/25-nodo-risk.png)
 
-**JSON de Fraud API:** — archivo [`snippets/04-fraud-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/04-fraud-body.txt):
+**JSON de Fraud API:** — archivo [`snippets/04-fraud-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/04-fraud-body.txt) (la línea 1 es la URL; copia solo la última línea, el body):
 
 ```
 {{ JSON.stringify({ customer_id: $json.customer_id, ip: $json.ip, channel: $json.channel, amount: $json.requested_amount, device_id: $json.device_id }) }}
@@ -328,7 +336,7 @@ en el campo **JSON** (empieza con `{{`, por eso queda en modo *Expression*).
 
 ![Configuración de HTTP Request - Fraud API](img/guia/26-nodo-fraud.png)
 
-**JSON de CRM API:** — archivo [`snippets/05-crm-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/05-crm-body.txt):
+**JSON de CRM API:** — archivo [`snippets/05-crm-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/05-crm-body.txt) (la línea 1 es la URL; copia solo la última línea, el body):
 
 ```
 {{ JSON.stringify({ customer_id: $json.customer_id }) }}
@@ -423,7 +431,7 @@ Agent* de n8n).
    | Campo | Valor |
    |---|---|
    | Method | `POST` |
-   | URL | `{{ $env.LLM_BASE_URL.trim().replace(/\/+$/, '') }}/v1beta/models/{{ $env.LLM_MODEL }}:generateContent` (archivo `08-gemini-url.txt`) |
+   | URL | `{{ $env.LLM_BASE_URL.trim().replace(/\/+$/, '') }}/v1beta/models/{{ $env.LLM_MODEL }}:generateContent` (línea 1 de `08-gemini-agent.txt`) |
    | Authentication | `None` |
    | Send Headers | activado |
    | Specify Headers | `Using Fields Below` |
@@ -443,8 +451,9 @@ Agent* de n8n).
 
    ![Configuración de Gemini Agent: URL, Authentication None y header x-goog-api-key](img/guia/30-nodo-gemini.png)
 
-3. En **JSON** pega el cuerpo completo desde [`snippets/08-gemini-body.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/08-gemini-body.txt) (es una sola línea
-   larga; cópiala entera):
+3. En **JSON** pega el cuerpo completo: la última línea de [`snippets/08-gemini-agent.txt`](https://github.com/juan-manjarr/taller-n8n-bintec-2026/blob/main/snippets/08-gemini-agent.txt)
+   (ese archivo trae, separados por una línea vacía: URL, nombre del header, valor del header y body).
+   Es una sola línea larga; cópiala entera:
 
 ```
 {{ JSON.stringify({ system_instruction: { parts: [{ text: "Eres un agente bancario experto en riesgo y atención al cliente. Tu misión es revisar la información financiera y de seguridad de un cliente para decidir si la solicitud puede ser aprobada, rechazada o requiere revisión manual. Revisa los datos del cliente, el score de riesgo, la evaluación de fraude y la capacidad de endeudamiento. El campo decision DEBE ser exactamente uno de estos cuatro valores, sin variaciones: APROBADO, APROBADO_CON_RESTRICCIONES, RECHAZADO, PENDIENTE_REVISION_HUMANA. Usa APROBADO solo cuando no exista ninguna alerta de fraude activa (alerts.suspicious_ip, alerts.high_amount, alerts.risky_channel todas en false) y el monto aprobado sea igual al límite completo. Usa APROBADO_CON_RESTRICCIONES cuando el riesgo sea bajo o medio pero exista al menos una alerta de fraude activa, o cuando el monto aprobado sea menor al solicitado. Usa RECHAZADO cuando el riesgo sea alto y no proceda ninguna aprobación. Usa PENDIENTE_REVISION_HUMANA solo si tú mismo consideras que el caso es ambiguo y requiere que un humano decida. Devuelve un resultado con: decisión, razón, monto sugerido, riesgo y mensaje final para el cliente. Hazlo con lenguaje claro, conservador y orientado a la seguridad. Responde ÚNICAMENTE con un objeto JSON válido (sin texto adicional, sin markdown) con las claves: decision, risk_level, approved_amount, reason, human_review, customer_message." }] }, contents: [ { parts: [ { text: JSON.stringify($json) } ] } ] }) }}
@@ -464,7 +473,8 @@ modelo como texto JSON (a veces envuelta en ```` ```json ````). El paso siguient
 ## 10. Pasos 9, 10 y 11 — Parsear, auditar y calcular el guardrail
 
 Son tres nodos **Code** seguidos. Para cada uno: `+` → `Code`, renómbralo, deja *Run Once for All
-Items* / *JavaScript*, borra el ejemplo y pega el código.
+Items* / *JavaScript*, borra el ejemplo y pega el código **desde el archivo de `snippets/`** que indica
+cada paso (no desde el PDF: los saltos de línea rompen el código).
 
 ### Paso 9 — `Parsear respuesta del agente`
 
@@ -656,6 +666,9 @@ El flujo completo queda así:
    }
    ```
 
+   > Si importaste la solución (`solucion/Flujo Bancario Multiagente N8N.json`), esa rama responde
+   > `"decision": "Pendiente revision humana"` y `"human_review": "true"` (texto), como en el PDF.
+
    ![Ejecución por la rama de revisión humana](img/guia/38-ejecucion-revision.png)
 
 5. En la pestaña **Executions** (arriba al centro) queda el historial de ejecuciones. Al abrir una ves
@@ -694,7 +707,7 @@ responda siempre en `/webhook/solicitud-bancaria`, **publícalo**:
 
    Resultado esperado: el caso 1 y el 3 con la decisión del modelo (`APROBADO`,
    `APROBADO_CON_RESTRICCIONES` o `RECHAZADO`, según lo que decida) y el caso 2 con
-   `PENDIENTE_REVISION_HUMANA`. Si cambias el flujo después de publicar, vuelve a hacer clic en
+   `PENDIENTE_REVISION_HUMANA` (`Pendiente revision humana` con la solución importada). Si cambias el flujo después de publicar, vuelve a hacer clic en
    **Publish** para que producción use la versión nueva.
 
 ---
@@ -720,6 +733,7 @@ responda siempre en `/webhook/solicitud-bancaria`, **publícalo**:
 | Gemini Agent: **429** | Superaste el límite por minuto o el presupuesto de la llave | Espera un minuto; si dice presupuesto, avisa al organizador |
 | Gemini Agent: **404** | `LLM_BASE_URL` incorrecta | Debe ser solo el dominio, sin rutas; luego `docker compose up -d` |
 | La respuesta dice *"Solicitud bloqueada…"* | La llave del taller solo admite peticiones del flujo bancario | Revisa que el JSON del paso 8 sea el de la guía |
+| Un nodo Code o un campo JSON se ve con errores en rojo (*SyntaxError*, *Unexpected token*, *Invalid or unexpected token*) | El código se copió desde el PDF y quedó con saltos de línea partidos o caracteres invisibles | Bórralo y pégalo de nuevo desde `snippets/` o desde la versión web de la guía |
 | Parsear respuesta: *Unexpected token* | El modelo respondió algo que no es JSON | Vuelve a ejecutar; si se repite, revisa que el JSON del paso 8 esté completo |
 | `port is already allocated` (opción A) | El puerto 5678 está ocupado | Define `N8N_PORT=5679` en `.env`, abre http://localhost:5679 y usa `BASE_URL=http://localhost:5679` con los scripts |
 | Codespaces: *Connection lost* permanente en el editor | El codespace se creó antes de la corrección de `.devcontainer/` (el navegador entra por `localhost` y n8n espera el dominio `app.github.dev`) | `git pull`, luego F1 → `Codespaces: Rebuild Container` (o crea un codespace nuevo); `docker compose ps` debe mostrar `n8n-proxy` |

@@ -1,7 +1,7 @@
 # snippets/
 
 Texto plano para copiar al armar el flujo en n8n.
-Todo sale literalmente de `solucion/flujo-bancario-multiagente.json` (el flujo verificado), sin retocar.
+Todo sale literalmente de `solucion/Flujo Bancario Multiagente N8N.json` (el flujo verificado), sin retocar.
 La guía paso a paso (`docs/GUIA-PASO-A-PASO.pdf`) y el video (`docs/VIDEO-PASO-A-PASO.mp4`) indican
 en cada nodo qué archivo de esta carpeta usar.
 
@@ -25,9 +25,11 @@ Los archivos de esta carpeta no tienen nada de eso — son bytes exactos del flu
    Al pegar debe aparecer una vista previa del valor evaluado; si no aparece, el campo
    sigue en Fixed y n8n lo trata como texto literal.
 4. **Una linea larguisima no es un error.**
-   Los `.txt` son UNA sola linea. El body de Gemini tiene 1389 chars en una linea.
-   Copia el archivo completo (Ctrl+A, Ctrl+C): no trae nada mas que el valor del campo.
+   Cada valor es UNA sola linea. El body de Gemini tiene 1389 chars en una linea.
    No la partas y no agregues salto de linea al final.
+   `03`-`05` traen la URL en la linea 1 y el body en la linea 3; `08-gemini-agent.txt` trae, separados
+   por una linea vacia: URL, nombre del header, valor del header y body. Copia solo la linea que
+   corresponde a cada campo.
 5. **Dos nombres de nodo son obligatorios**, porque otros nodos los citan por nombre:
    - `Combinar respuestas`  (Nodo 07)
    - `Gemini Agent`  (Nodo 08)
@@ -41,13 +43,13 @@ Los archivos de esta carpeta no tienen nada de eso — son bytes exactos del flu
 
 | Nodo | Archivo | Se pega en | Modo |
 |------|---------|-----------|------|
-| 02 Set             | `02-preparar-payload.node.json` | pegar el nodo entero en el lienzo | JSON de nodo |
+| 02 Set             | `02-preparar-payload.node.json` | campo JSON (Mode: JSON)    | Expression |
 | 03 HTTP Risk API   | `03-risk-body.txt`          | JSON Body                  | Expression |
 | 04 HTTP Fraud API  | `04-fraud-body.txt`         | JSON Body                  | Expression |
 | 05 HTTP CRM API    | `05-crm-body.txt`           | JSON Body                  | Expression |
 | 07 Code            | `07-combinar-respuestas.js` | campo JavaScript            | Code       |
-| 08 HTTP Gemini     | `08-gemini-url.txt`         | URL                        | Expression |
-| 08 HTTP Gemini     | `08-gemini-body.txt`        | JSON Body                  | Expression |
+| 08 HTTP Gemini     | `08-gemini-agent.txt` linea 1 | URL                      | Expression |
+| 08 HTTP Gemini     | `08-gemini-agent.txt` ultima linea | JSON Body           | Expression |
 | 09 Code            | `09-parsear-respuesta.js`   | campo JavaScript            | Code       |
 | 10 Code            | `10-auditoria.js`           | campo JavaScript            | Code       |
 | 11 Code            | `11-guardrail.js`           | campo JavaScript            | Code       |
@@ -101,16 +103,13 @@ Webhook falla con *"No Respond to Webhook node found in the workflow"*.
 
 ### 02 Set (Edit Fields) — nombre: `Preparar payload`
 
-Pega el nodo completo directamente en el lienzo desde `02-preparar-payload.node.json`:
+| Campo  | Valor |
+|--------|-------|
+| Mode   | `JSON` |
+| JSON (Expression) | copia `02-preparar-payload.node.json` completo |
 
-1. Abre `02-preparar-payload.node.json` en VS Code
-2. Ctrl+A → Ctrl+C
-3. Haz clic sobre el lienzo de n8n (que no haya ningun nodo seleccionado)
-4. Ctrl+V — el nodo aparece listo con los 7 campos ya configurados
-
-El nodo ya trae el nombre `Preparar payload`, los 7 campos con su tipo correcto
-(`requested_amount` y `term_months` como Number, el resto como String) y todas
-las expresiones apuntando a `$json.body.*`. No hay que configurar nada adicional.
+Asi lo tiene la solucion: los 7 campos salen de `$json.body.*` y llegan como texto (tambien
+`requested_amount` y `term_months`); los servicios Risk, Fraud y CRM los aceptan igual.
 
 ---
 
@@ -124,7 +123,7 @@ las expresiones apuntando a `$json.body.*`. No hay que configurar nada adicional
 | Send Body           | ON                         |
 | Body Content Type   | `JSON`                     |
 | Specify Body        | `Using JSON`               |
-| JSON (Expression)   | copia `03-risk-body.txt`   |
+| JSON (Expression)   | linea 3 de `03-risk-body.txt` |
 
 ---
 
@@ -138,7 +137,7 @@ las expresiones apuntando a `$json.body.*`. No hay que configurar nada adicional
 | Send Body           | ON                          |
 | Body Content Type   | `JSON`                      |
 | Specify Body        | `Using JSON`                |
-| JSON (Expression)   | copia `04-fraud-body.txt`   |
+| JSON (Expression)   | linea 3 de `04-fraud-body.txt` |
 
 ---
 
@@ -152,7 +151,7 @@ las expresiones apuntando a `$json.body.*`. No hay que configurar nada adicional
 | Send Body           | ON                             |
 | Body Content Type   | `JSON`                         |
 | Specify Body        | `Using JSON`                   |
-| JSON (Expression)   | copia `05-crm-body.txt`        |
+| JSON (Expression)   | linea 3 de `05-crm-body.txt` |
 
 **Importante:** desde dentro de n8n (que corre en Docker) los servicios se llaman por
 nombre de servicio (`risk-api`, `fraud-api`, `crm-api`), no por `localhost`.
@@ -187,7 +186,7 @@ Borra el codigo de ejemplo y pega el contenido de `07-combinar-respuestas.js`.
 | Campo               | Valor                                |
 |---------------------|--------------------------------------|
 | Method              | `POST`                               |
-| URL (Expression)    | copia `08-gemini-url.txt`            |
+| URL (Expression)    | linea 1 de `08-gemini-agent.txt`     |
 | Authentication      | None (la key va como header)         |
 | Send Headers        | ON                                   |
 | Specify Headers     | `Using Fields Below`                 |
@@ -196,7 +195,7 @@ Borra el codigo de ejemplo y pega el contenido de `07-combinar-respuestas.js`.
 | Send Body           | ON                                   |
 | Body Content Type   | `JSON`                               |
 | Specify Body        | `Using JSON`                         |
-| JSON (Expression)   | copia `08-gemini-body.txt`           |
+| JSON (Expression)   | ultima linea de `08-gemini-agent.txt` |
 
 **Pestaña Settings del nodo 08** (pestana Settings, no Parameters):
 
@@ -249,7 +248,7 @@ Mode: **Manual Mapping**
 | Name               | Type    | Value                                       |
 |--------------------|---------|---------------------------------------------|
 | `human_review`     | Boolean | `true`                                      |
-| `decision`         | String  | `PENDIENTE_REVISION_HUMANA`                 |
+| `decision`         | String  | `PENDIENTE_REVISION_HUMANA` (la solucion usa `Pendiente revision humana`) |
 | `customer_message` | String  | copia `13-mensaje-revision.txt` (modo Fixed)|
 
 ---

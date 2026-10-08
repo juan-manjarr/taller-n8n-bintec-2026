@@ -7,7 +7,8 @@ llave** en un archivo.
 **Guías** (en `docs/`):
 - [`GUIA-PASO-A-PASO.pdf`](docs/GUIA-PASO-A-PASO.pdf) ([versión web](docs/GUIA-PASO-A-PASO.md)):
   el flujo clic a clic, con capturas, para quien usa n8n por primera vez. Ya está adaptada a este
-  repositorio.
+  repositorio. **No copies código desde los PDF**: al pegarlo en n8n quedan saltos de línea que lo
+  rompen; cópialo desde `snippets/` o desde la versión web.
 - [`VIDEO-PASO-A-PASO.mp4`](docs/VIDEO-PASO-A-PASO.mp4) (10:46, sin audio, con subtítulos): el flujo
   construido en n8n de principio a fin, ejecutado y publicado. Capítulos: 0:00 Webhook · 1:05 Preparar
   payload · 1:59 Risk, Fraud y CRM · 3:50 Merge y Combinar respuestas · 4:40 Gemini Agent ·
@@ -74,7 +75,8 @@ La primera vez descarga las imágenes y tarda uno o dos minutos. Está listo cua
 
 **Abre n8n**
 
-http://localhost:5678 — usuario `admin@bintec.local`, contraseña `Bintec2026!`
+http://localhost:5678 — usuario `admin@bintec.local`, contraseña `Bintec2026!`. Si aparece la ventana
+del *n8n Assistant*, elige **Set up later in Settings**.
 
 ## 1B. Puesta en marcha sin Docker: GitHub Codespaces
 
@@ -160,17 +162,17 @@ Con el flujo publicado (*Publish*):
 | Solicitud | Resultado esperado |
 |---|---|
 | `01-cliente-preferencial.json` | Aprobación |
-| `02-fraude-alto.json` | `PENDIENTE_REVISION_HUMANA` (el guardrail fuerza revisión humana) |
+| `02-fraude-alto.json` | Revisión humana: `PENDIENTE_REVISION_HUMANA` si seguiste la guía paso a paso, `Pendiente revision humana` con la solución importada (el guardrail fuerza revisión humana) |
 | `03-cliente-nuevo.json` | Decisión del modelo para un cliente sin historial |
 
 Cada ejecución queda en la pestaña *Executions* del flujo, con el detalle nodo por nodo.
 
 ## 4. La solución (para el final)
 
-Si te atascas o quieres comparar, el flujo terminado está en `solucion/flujo-bancario-multiagente.json`:
+Si te atascas o quieres comparar, el flujo terminado está en `solucion/Flujo Bancario Multiagente N8N.json`:
 
 1. En n8n: *Create workflow* → menú **⋯** (arriba a la derecha) → **Import from file…**
-2. Elige `solucion/flujo-bancario-multiagente.json`.
+2. Elige `solucion/Flujo Bancario Multiagente N8N.json`.
 3. Pulsa **Publish**. Si ya tienes publicado tu propio flujo con el mismo webhook, despublícalo
    primero: dos flujos no pueden usar la misma ruta a la vez.
 
