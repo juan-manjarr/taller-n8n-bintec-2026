@@ -142,6 +142,10 @@ Diferencias con la opción A durante el resto de la guía:
 - Los comandos de prueba se ejecutan **en la terminal del codespace** y son los de **bash**
   (`./scripts/test-flow.sh …`), no los de PowerShell. Las URLs de webhook que muestra n8n
   (`http://localhost:5678/...`) funcionan desde esa terminal.
+- La extensión de **Postman** para VS Code viene instalada en el codespace (ícono de Postman en la
+  barra lateral; pide iniciar sesión con una cuenta de Postman). Corre dentro del codespace, así que
+  usa `http://localhost:5678`: por ejemplo `POST http://localhost:5678/webhook-test/solicitud-bancaria`
+  con *Body → raw → JSON* y el contenido de un archivo de `requests/`.
 - **No cambies la visibilidad del puerto a *Public***: cualquiera con la URL podría entrar con la
   contraseña del taller.
 - El codespace se suspende tras 30 minutos sin uso. Al reabrirlo (https://github.com/codespaces)

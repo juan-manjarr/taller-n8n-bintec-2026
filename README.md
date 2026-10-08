@@ -99,6 +99,10 @@ En Codespaces:
 - En el codespace, `docker compose` agrega solo un nginx delante de n8n (`n8n-proxy`): corrige los
   encabezados del reenvío de puertos de GitHub para que el editor no pierda la conexión en vivo
   (*Connection lost*). Usa siempre `docker compose up -d` sin `-f`, para que se aplique.
+- La extensión de **Postman** para VS Code viene instalada en el codespace (ícono de Postman en la
+  barra lateral; pide iniciar sesión con una cuenta de Postman). Corre dentro del codespace, así que
+  usa `http://localhost:5678`: por ejemplo `POST http://localhost:5678/webhook-test/solicitud-bancaria`
+  con *Body → raw → JSON* y el contenido de un archivo de `requests/`.
 - Los comandos de este README van en la **terminal del codespace** y son los de **bash**
   (`./scripts/test-flow.sh`). Las URLs de webhook que muestra n8n (`http://localhost:5678/...`)
   funcionan desde esa terminal.
