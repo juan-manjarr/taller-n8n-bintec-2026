@@ -666,9 +666,6 @@ El flujo completo queda así:
    }
    ```
 
-   > Si importaste la solución (`solucion/Flujo Bancario Multiagente N8N.json`), esa rama responde
-   > `"decision": "Pendiente revision humana"` y `"human_review": "true"` (texto), como en el PDF.
-
    ![Ejecución por la rama de revisión humana](img/guia/38-ejecucion-revision.png)
 
 5. En la pestaña **Executions** (arriba al centro) queda el historial de ejecuciones. Al abrir una ves
@@ -707,7 +704,7 @@ responda siempre en `/webhook/solicitud-bancaria`, **publícalo**:
 
    Resultado esperado: el caso 1 y el 3 con la decisión del modelo (`APROBADO`,
    `APROBADO_CON_RESTRICCIONES` o `RECHAZADO`, según lo que decida) y el caso 2 con
-   `PENDIENTE_REVISION_HUMANA` (`Pendiente revision humana` con la solución importada). Si cambias el flujo después de publicar, vuelve a hacer clic en
+   `PENDIENTE_REVISION_HUMANA`. Si cambias el flujo después de publicar, vuelve a hacer clic en
    **Publish** para que producción use la versión nueva.
 
 ---

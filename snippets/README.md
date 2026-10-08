@@ -248,7 +248,7 @@ Mode: **Manual Mapping**
 | Name               | Type    | Value                                       |
 |--------------------|---------|---------------------------------------------|
 | `human_review`     | Boolean | `true`                                      |
-| `decision`         | String  | `PENDIENTE_REVISION_HUMANA` (la solucion usa `Pendiente revision humana`) |
+| `decision`         | String  | `PENDIENTE_REVISION_HUMANA`                 |
 | `customer_message` | String  | copia `13-mensaje-revision.txt` (modo Fixed)|
 
 ---

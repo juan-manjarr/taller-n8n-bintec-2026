@@ -162,7 +162,7 @@ Con el flujo publicado (*Publish*):
 | Solicitud | Resultado esperado |
 |---|---|
 | `01-cliente-preferencial.json` | Aprobación |
-| `02-fraude-alto.json` | Revisión humana: `PENDIENTE_REVISION_HUMANA` si seguiste la guía paso a paso, `Pendiente revision humana` con la solución importada (el guardrail fuerza revisión humana) |
+| `02-fraude-alto.json` | `PENDIENTE_REVISION_HUMANA` (el guardrail fuerza revisión humana) |
 | `03-cliente-nuevo.json` | Decisión del modelo para un cliente sin historial |
 
 Cada ejecución queda en la pestaña *Executions* del flujo, con el detalle nodo por nodo.

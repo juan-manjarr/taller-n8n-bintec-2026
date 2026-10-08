@@ -141,7 +141,10 @@
         -48
       ],
       "id": "18fdcea0-f84c-415a-8b84-0bf0d48d3743",
-      "name": "Gemini Agent"
+      "name": "Gemini Agent",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -223,13 +226,13 @@
             {
               "id": "aef99038-dc8a-46ed-9117-3c2f150acca1",
               "name": "human_review",
-              "value": "true",
-              "type": "string"
+              "value": true,
+              "type": "boolean"
             },
             {
               "id": "e6e87d4a-4269-4757-9a32-f24bc18d9482",
               "name": "decision",
-              "value": "Pendiente revision humana",
+              "value": "PENDIENTE_REVISION_HUMANA",
               "type": "string"
             },
             {
