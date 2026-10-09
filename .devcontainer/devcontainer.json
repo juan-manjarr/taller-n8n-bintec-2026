@@ -33,9 +33,10 @@
     "codespaces": {
       "openFiles": ["README.md"]
     },
-    // Postman se instala dentro del codespace: desde ahí http://localhost:5678 es n8n.
+    // REST Client ejecuta los archivos requests/*.http. Corre dentro del codespace, así que
+    // http://localhost:5678 llega a n8n.
     "vscode": {
-      "extensions": ["postman.postman-for-vscode"]
+      "extensions": ["humao.rest-client"]
     }
   }
 }

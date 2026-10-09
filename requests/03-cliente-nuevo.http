@@ -1,0 +1,20 @@
+# Caso 3: cliente nuevo. Respuesta esperada: la decisión del modelo para un cliente sin historial.
+#
+# Se ejecuta con la extensión REST Client de VS Code (viene instalada en Codespaces):
+# clic en "Send Request", sobre la petición que quieras enviar. La respuesta se abre en un panel a la derecha.
+# El cuerpo de la solicitud se lee de 03-cliente-nuevo.json.
+# Si n8n usa otro puerto (N8N_PORT en .env), cámbialo en @base.
+
+@base = http://localhost:5678
+
+### Prueba: primero pulsa "Execute workflow" en el editor de n8n (atiende una sola solicitud por clic)
+POST {{base}}/webhook-test/solicitud-bancaria
+Content-Type: application/json
+
+< ./03-cliente-nuevo.json
+
+### Producción: el flujo debe estar publicado (botón Publish)
+POST {{base}}/webhook/solicitud-bancaria
+Content-Type: application/json
+
+< ./03-cliente-nuevo.json

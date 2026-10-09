@@ -100,10 +100,8 @@ En Codespaces:
 - En el codespace, `docker compose` agrega solo un nginx delante de n8n (`n8n-proxy`): corrige los
   encabezados del reenvío de puertos de GitHub para que el editor no pierda la conexión en vivo
   (*Connection lost*). Usa siempre `docker compose up -d` sin `-f`, para que se aplique.
-- La extensión de **Postman** para VS Code viene instalada en el codespace (ícono de Postman en la
-  barra lateral; pide iniciar sesión con una cuenta de Postman). Corre dentro del codespace, así que
-  usa `http://localhost:5678`: por ejemplo `POST http://localhost:5678/webhook-test/solicitud-bancaria`
-  con *Body → raw → JSON* y el contenido de un archivo de `requests/`.
+- La extensión **REST Client** viene instalada en el codespace: ejecuta los archivos
+  `requests/*.http` (ver *Probar el flujo en Codespaces*, abajo).
 - Los comandos de este README van en la **terminal del codespace** y son los de **bash**
   (`./scripts/test-flow.sh`). Las URLs de webhook que muestra n8n (`http://localhost:5678/...`)
   funcionan desde esa terminal.
@@ -113,6 +111,41 @@ En Codespaces:
   los servicios se levantan solos y tu flujo se conserva.
 - Las cuentas personales de GitHub incluyen horas gratuitas de Codespaces al mes. Al terminar el
   taller, elimina el codespace en https://github.com/codespaces.
+
+### Probar el flujo en Codespaces
+
+Hay dos formas de enviar las solicitudes de `requests/` al webhook de n8n. Las dos usan
+`http://localhost:5678`, que dentro del codespace es n8n.
+
+| Cuándo | Qué hacer antes en n8n | Ruta del webhook |
+|---|---|---|
+| Mientras construyes el flujo | Pulsar **Execute workflow** (atiende **una** solicitud por clic) | `/webhook-test/solicitud-bancaria` |
+| Con el flujo terminado | Pulsar **Publish** | `/webhook/solicitud-bancaria` |
+
+**Opción 1 — Terminal con `test-flow.sh`.** En la terminal del codespace (bash):
+
+```bash
+# Mientras construyes: pulsa "Execute workflow" en n8n y luego envía un caso
+WEBHOOK_PATH=webhook-test ./scripts/test-flow.sh requests/01-cliente-preferencial.json
+
+# Con el flujo publicado: envía los tres casos seguidos
+./scripts/test-flow.sh
+```
+
+La respuesta del flujo (el JSON con `decision`, `customer_message`, …) se imprime en la terminal.
+Si aparece *Permission denied*, ejecuta `chmod +x scripts/*.sh` (o usa `bash scripts/test-flow.sh`).
+
+**Opción 2 — Extensión REST Client.** Cada caso de `requests/` tiene su archivo `.http`:
+
+1. En el explorador de archivos abre, por ejemplo, `requests/01-cliente-preferencial.http`.
+2. Sobre cada petición aparece el enlace **Send Request**:
+   - la primera (`/webhook-test/…`) es la de **prueba**: pulsa antes *Execute workflow* en n8n;
+   - la segunda (`/webhook/…`) es la de **producción**: el flujo debe estar publicado.
+3. La respuesta se abre en un panel a la derecha, con el código HTTP y el JSON del flujo.
+
+El cuerpo de cada petición se lee del `.json` del mismo nombre (`< ./01-cliente-preferencial.json`),
+así que para probar otros datos basta con editar ese `.json`. El resultado esperado de cada caso está
+en la sección 3.
 
 ## 2. Construye el flujo
 
@@ -215,7 +248,7 @@ docker compose down -v          # detiene y borra todo (n8n vuelve a quedar vac�
 │   ├── VIDEO-PASO-A-PASO.mp4   # el mismo proceso en video narrado (12:41)
 │   └── Taller_Bintec_Guia_Completa.pdf   # guía original del taller
 ├── mock_services/              # Risk, Fraud y CRM (FastAPI)
-├── requests/                   # solicitudes de ejemplo
+├── requests/                   # solicitudes de ejemplo (.json) y su versión para REST Client (.http)
 ├── scripts/test-flow.{sh,ps1}  # envía las solicitudes al webhook
 ├── snippets/                   # valores de cada nodo en texto plano, para copiar
 └── solucion/                   # flujo terminado, para importar al final
